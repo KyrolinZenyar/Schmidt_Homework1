@@ -2,7 +2,9 @@
 <TabbedPage  xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Schmidt_Homework1"
-             x:Class="Schmidt_Homework1.MainPage">
+             x:Class="Schmidt_Homework1.MainPage"
+             xmlns:android="clr-namespace:Xamarin.Forms.PlatformConfiguration.AndroidSpecific;assembly=Xamarin.Forms.Core"
+            android:TabbedPage.IsSwipePagingEnabled="False">
 
     <local:ColorChanger Title="Color Changer"/>
     <local:DrawingPanel Title="Drawing Panel"/>
