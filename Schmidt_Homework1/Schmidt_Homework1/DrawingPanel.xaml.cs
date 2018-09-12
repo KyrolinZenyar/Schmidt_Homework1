@@ -18,6 +18,7 @@ namespace Schmidt_Homework1
         private List<SKPath> paths = new List<SKPath>();
         private SKColor color = new SKColor(0, 0, 0);
         private int strokeWidth = 3;
+        SKBitmap paintBitmap;
 
         public DrawingPanel ()
 		{
@@ -49,6 +50,9 @@ namespace Schmidt_Homework1
             {
                 paintCanvas.DrawPath(path, paint);
             }
+
+            paintBitmap = new SKBitmap((int)Canvas.Width, (int)Canvas.Height);
+            e.Surface.Canvas.DrawBitmap(paintBitmap, 0, 0);
 
         }
 
@@ -102,42 +106,50 @@ namespace Schmidt_Homework1
         {
             var info = new SKImageInfo((int)Canvas.Width, (int)Canvas.Height);
 
-            var surface = SKSurface.Create(info);
-            var canvas = surface.Canvas;
-            canvas.Clear();
-            var paint = new SKPaint
-            {
-                Color = color,
-                Style = SKPaintStyle.Stroke,
-                IsAntialias = true,
-                StrokeWidth = strokeWidth
-            };
+            //var surface = pain
+            //var canvas = paintSurface.Canvas;
+            //canvas.Clear();
+            //var paint = new SKPaint
+            //{
+            //    Color = color,
+            //    Style = SKPaintStyle.Stroke,
+            //    IsAntialias = true,
+            //    StrokeWidth = strokeWidth
+            //};
 
-            foreach (SKPath path in paths)
-                canvas.DrawPath(path, paint);
+            //foreach (SKPath path in paths)
+            //    canvas.DrawPath(path, paint);
 
-            foreach (SKPath path in tempPaths.Values)
-                canvas.DrawPath(path, paint);
+            //foreach (SKPath path in tempPaths.Values)
+            //    canvas.DrawPath(path, paint);
 
-            canvas.Flush();
+            //canvas.Flush();
 
-            var snap = surface.Snapshot();
-            var pngImage = snap.Encode();
+            //var snap = surface.Snapshot();
+            //var pngImage = snap.Encode();
 
-            byte[] photoData = pngImage.ToArray();
-            
+            //SKImage image = SKImage.FromBitmap();
+
+            //byte[] photoData = pngImage.ToArray();
+
+            //SKBitmap paintBitmap = new SKBitmap(info.Width, info.Height);
+            //canvas.DrawBitmap(paintBitmap, 0, 0);
+
+            SKImage paintPhoto = SKImage.FromBitmap(paintBitmap);
+            SKData photoData = paintPhoto.Encode();
+
             if(photoData == null)
             {
                 Save.Text = "photo data null";
             }
-            else if(photoData.Length == 0)
-            {
-                Save.Text = "encode returned empty";
-            }
+            //else if(photoData.Length == 0)
+            //{
+            //    Save.Text = "encode returned empty";
+            //}
             else
             {
                 var photoSaver = DependencyService.Get<IPhotoSaver>();
-                string success = await DependencyService.Get<IPhotoSaver>().SaveAsync(photoData, "test.jpg");
+                string success = await DependencyService.Get<IPhotoSaver>().SaveAsync(photoData.ToArray(), "test.jpg");
                 //if (success == true)
                 //{
                 //    Save.Text = "Save success";
@@ -146,7 +158,7 @@ namespace Schmidt_Homework1
                 //{
                 //    Save.Text = "save failed";
                 //}
-                test.Text = success;
+                //test.Text = success;
             }
 
         }

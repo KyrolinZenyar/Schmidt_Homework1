@@ -8,7 +8,7 @@
         <Grid x:Name="CanvasHolder">
                 
             <views:SKCanvasView x:Name="Canvas" PaintSurface="OnPainting" EnableTouchEvents="true" Touch="OnTouch" />
-                <!--<Label x:Name="test" Text="Big test one two threk jiejasdlkfjslkvnxzjkvnsadojkads"></Label>-->
+                <!--<Label x:Name="test" Text="test label"></Label>-->
                 <Grid x:Name="ButtonHolder" VerticalOptions="End" Margin="0, 0, 0, 10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />

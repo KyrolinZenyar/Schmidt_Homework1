@@ -2,13 +2,9 @@
 using System;
 using Java.IO;
 using System.Threading.Tasks;
-using Xamarin.Android;
 using Xamarin.Forms;
-using Android.Support.V4.Content;
-using Android;
-using Android.Content.PM;
-using Android.Support.V4.App;
-using Android.App;
+using Plugin.Permissions;
+using Plugin.Permissions.Abstractions;
 
 [assembly: Dependency(typeof(PhotoSaver))]
 public class PhotoSaver: IPhotoSaver
@@ -18,11 +14,11 @@ public class PhotoSaver: IPhotoSaver
         string test;
         try
         {
-            //File pictureDir = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryPictures);
-            string pictureDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            File pictureDir = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryPictures);
+            //string pictureDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             File saveFile = new File(pictureDir, saveFileName);
             //Android.App.Application.Context context;
-            
+
             test = saveFile.AbsolutePath;
             //Activity activity = (Activity)Android.App.Application.Context;
             //if (ContextCompat.CheckSelfPermission(Android.App.Application.Context, Manifest.Permission.WriteExternalStorage) == (int)Permission.Granted)
@@ -34,13 +30,28 @@ public class PhotoSaver: IPhotoSaver
             //{
 
             //}
-            FileOutputStream outputStream = new FileOutputStream(saveFile);
 
-            saveFile.CreateNewFile();
+            var permStatus = await CrossPermissions.Current.CheckPermissionStatusAsync(Permission.Storage);
+            if (permStatus != PermissionStatus.Granted)
+            {
+                test = "Perms no";
+                var permResults = await CrossPermissions.Current.RequestPermissionsAsync(Permission.Storage);
+                permStatus = permResults[Permission.Storage];
+                
+            }
 
-            //await outputStream.WriteAsync(photoData);
+            if (permStatus == PermissionStatus.Granted)
+            {
+                FileOutputStream outputStream = new FileOutputStream(saveFile);
+                saveFile.CreateNewFile();
+                await outputStream.WriteAsync(photoData);
+                test = "Perms yes";
+            }
+
+
+
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             test = e.InnerException.Message;
             return test;
