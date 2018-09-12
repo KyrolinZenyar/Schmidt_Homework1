@@ -5,7 +5,20 @@
              x:Class="Schmidt_Homework1.DrawingPanel">
     <ContentPage.Content>
         <Grid>
-            <views:SKCanvasView PaintSurface="OnPainting" EnableTouchEvents="true" Touch="OnTouch" />
+        <Grid x:Name="CanvasHolder">
+            <views:SKCanvasView x:Name="Canvas" PaintSurface="OnPainting" EnableTouchEvents="true" Touch="OnTouch" />
+                <Grid x:Name="ButtonHolder" VerticalOptions="End" Margin="0, 0, 0, 10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="PickColor" Text="Pick Color" Grid.Column="0" Clicked="OnColorPick"></Button>
+                    <Button x:Name="Clear" Text="Clear" Grid.Column="1" Clicked="OnClear"></Button>
+                    <Button x:Name="Save" Text="Save" Grid.Column="2" Clicked="OnSave"></Button>
+                </Grid>
+            </Grid>
         </Grid>
+        
     </ContentPage.Content>
 </ContentPage>
