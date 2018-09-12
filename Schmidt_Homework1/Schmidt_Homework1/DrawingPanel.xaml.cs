@@ -32,7 +32,7 @@ namespace Schmidt_Homework1
             paintCanvas.Clear(SKColors.White);
 
             //Define SKPaint here (need to make colorpicker and strokeWidth picker)
-            var touchPathStroke = new SKPaint
+            var paint = new SKPaint
             {
                 Color = color,
                 Style = SKPaintStyle.Stroke,
@@ -43,11 +43,11 @@ namespace Schmidt_Homework1
             //As new paths (temporary or permanent) get created, draw them on the canvas
             foreach (var path in tempPaths)
             {
-                paintCanvas.DrawPath(path.Value, touchPathStroke);
+                paintCanvas.DrawPath(path.Value, paint);
             }
             foreach (var path in paths)
             {
-                paintCanvas.DrawPath(path, touchPathStroke);
+                paintCanvas.DrawPath(path, paint);
             }
 
         }
@@ -98,9 +98,57 @@ namespace Schmidt_Homework1
         }
 
         //NEED TO ADD SAVE FUNCTIONALITY
-        private void OnSave(object sender, EventArgs e)
+        private async void OnSave(object sender, EventArgs e)
         {
-            Save.Text = "Clicked!";
+            var info = new SKImageInfo((int)Canvas.Width, (int)Canvas.Height);
+
+            var surface = SKSurface.Create(info);
+            var canvas = surface.Canvas;
+            canvas.Clear();
+            var paint = new SKPaint
+            {
+                Color = color,
+                Style = SKPaintStyle.Stroke,
+                IsAntialias = true,
+                StrokeWidth = strokeWidth
+            };
+
+            foreach (SKPath path in paths)
+                canvas.DrawPath(path, paint);
+
+            foreach (SKPath path in tempPaths.Values)
+                canvas.DrawPath(path, paint);
+
+            canvas.Flush();
+
+            var snap = surface.Snapshot();
+            var pngImage = snap.Encode();
+
+            byte[] photoData = pngImage.ToArray();
+            
+            if(photoData == null)
+            {
+                Save.Text = "photo data null";
+            }
+            else if(photoData.Length == 0)
+            {
+                Save.Text = "encode returned empty";
+            }
+            else
+            {
+                var photoSaver = DependencyService.Get<IPhotoSaver>();
+                string success = await DependencyService.Get<IPhotoSaver>().SaveAsync(photoData, "test.jpg");
+                //if (success == true)
+                //{
+                //    Save.Text = "Save success";
+                //}
+                //else
+                //{
+                //    Save.Text = "save failed";
+                //}
+                test.Text = success;
+            }
+
         }
 
     }
