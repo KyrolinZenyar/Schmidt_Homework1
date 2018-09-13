@@ -1,11 +1,11 @@
-﻿using SkiaSharp;
+﻿using Amporis.Xamarin.Forms.ColorPicker;
+using SkiaSharp;
 using SkiaSharp.Views.Forms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -85,9 +85,15 @@ namespace Schmidt_Homework1
         }
 
         //NEED TO ADD COLOR PICKER
-        private void OnColorPick(object sender, EventArgs e)
+        private async void OnColorPick(object sender, EventArgs e)
         {
+            //ColorPickerPopup popupPage = new ColorPickerPopup();
+            //await Rg.Plugins.Popup.Extensions.NavigationExtension.PushPopupAsync(this.Navigation, popupPage);
+            //await PopupNavigation.Instance.PushAsync(_colorPickerPopup);
             PickColor.Text = "Clicked!";
+            var colorPage = new ColorPickerPopup(color);
+            await Navigation.PushModalAsync(colorPage);
+            //var newColor = await ColorPickerDialog.Show(mainGrid, "Pick a Color", Color.Black, null);
         }
 
         /***

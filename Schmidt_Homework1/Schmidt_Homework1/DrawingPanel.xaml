@@ -4,8 +4,8 @@
              xmlns:views="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms"
              x:Class="Schmidt_Homework1.DrawingPanel">
     <ContentPage.Content>
-        <Grid>
-        <Grid x:Name="CanvasHolder">
+        <Grid x:Name="mainGrid">
+            <Grid x:Name="CanvasHolder">
                 
             <views:SKCanvasView x:Name="Canvas" PaintSurface="OnPainting" EnableTouchEvents="true" Touch="OnTouch" />
                 <!--<Label x:Name="test" Text="test label"></Label>-->
