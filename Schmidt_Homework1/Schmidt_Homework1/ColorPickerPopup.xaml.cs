@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -13,10 +12,75 @@ namespace Schmidt_Homework1
 	[XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class ColorPickerPopup : ContentPage
 	{
-		public ColorPickerPopup (SKColor color)
+        public event EventHandler<ColorPickerEventArgs> ColorChosen;
+
+		public ColorPickerPopup (SKColor color, int stroke)
 		{
 			InitializeComponent ();
+            //This is to counteract a bug in Xamarin where the first tap of the slider doesn't fire the ValueChanged event
+            //Basically, set the initial value to non-zero, then after 1 millisecond, shift it back down to 0 so the first 
+            //change is made and the event fires from then on.
+            red.Value = 1;
+            green.Value = 1;
+            blue.Value = 1;
+            strokeWidth.Value = 0;
+            Device.StartTimer(TimeSpan.FromMilliseconds(1), () => {
+                red.Value = (double)color.Red;
+                green.Value = 0;
+                blue.Value = 0;
+                strokeWidth.Value = stroke;
+                return false;
+            });
 
-		}
-	}
+
+        }
+
+        private void OnStrokeChange(object sender, ValueChangedEventArgs e)
+        {
+            strokeLabel.Text = String.Format("Stroke Width: {0}", (int)e.NewValue);
+        }
+
+        private void OnColorChange(object sender, ValueChangedEventArgs e)
+        {
+            if(sender == red)
+            {
+                redLabel.Text = String.Format("Red: {0}", (int)e.NewValue);
+            }
+            else if (sender == green)
+            {
+                greenLabel.Text = String.Format("Green: {0}", (int)e.NewValue);
+                green.Value = e.NewValue;
+            }
+            else if (sender == blue)
+            {
+                blueLabel.Text = String.Format("Blue: {0}", (int)e.NewValue);
+                blue.Value = e.NewValue;
+            }
+            colorBox.Color = Color.FromRgb((int)red.Value, (int)green.Value, (int)blue.Value);
+        }
+
+        private async void OnCancel(object sender, EventArgs e)
+        {
+            await Navigation.PopModalAsync();
+        }
+
+        private async void OnSubmit(object sender, EventArgs e)
+        {
+            await Navigation.PopModalAsync();
+            ColorPickerEventArgs returnArgs = new ColorPickerEventArgs();
+            returnArgs.Red = (int)red.Value;
+            returnArgs.Blue = (int)blue.Value;
+            returnArgs.Green = (int)green.Value;
+            returnArgs.StrokeWidth = (int)strokeWidth.Value;
+            ColorChosen(this, returnArgs);
+        }
+    }
+
+    public class ColorPickerEventArgs: EventArgs
+    {
+        public int Red { get; set; }
+        public int Green { get; set; }
+        public int Blue { get; set; }
+        public int StrokeWidth { get; set; }
+    }
 }

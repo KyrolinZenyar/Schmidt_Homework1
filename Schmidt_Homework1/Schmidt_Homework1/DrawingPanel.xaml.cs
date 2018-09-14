@@ -1,5 +1,4 @@
-﻿using Amporis.Xamarin.Forms.ColorPicker;
-using SkiaSharp;
+﻿using SkiaSharp;
 using SkiaSharp.Views.Forms;
 using System;
 using System.Collections.Generic;
@@ -15,10 +14,13 @@ namespace Schmidt_Homework1
 	public partial class DrawingPanel : ContentPage
 	{
         private Dictionary<long, SKPath> tempPaths = new Dictionary<long, SKPath>();
-        private List<SKPath> paths = new List<SKPath>();
+        private Dictionary<long, SKPath> paths = new Dictionary<long, SKPath>();
+        private Dictionary<long, SKPaint> paints = new Dictionary<long, SKPaint>();
         private SKColor color = new SKColor(0, 0, 0);
         private int strokeWidth = 3;
-        SKBitmap paintBitmap;
+        private SKBitmap paintBitmap;
+        private SKPaint paint;
+        private long pathID = 0;
 
         public DrawingPanel ()
 		{
@@ -33,7 +35,7 @@ namespace Schmidt_Homework1
             paintCanvas.Clear(SKColors.White);
 
             //Define SKPaint here (need to make colorpicker and strokeWidth picker)
-            var paint = new SKPaint
+            paint = new SKPaint
             {
                 Color = color,
                 Style = SKPaintStyle.Stroke,
@@ -48,7 +50,9 @@ namespace Schmidt_Homework1
             }
             foreach (var path in paths)
             {
-                paintCanvas.DrawPath(path, paint);
+                var id = path.Key;
+
+                paintCanvas.DrawPath(path.Value, paints[id]);
             }
 
             paintBitmap = new SKBitmap((int)Canvas.Width, (int)Canvas.Height);
@@ -75,8 +79,10 @@ namespace Schmidt_Homework1
             }
             else if (e.ActionType == SKTouchAction.Released) {
                 //When the line ends (finger up)
-                paths.Add(tempPaths[e.Id]);
+                paths.Add(pathID, tempPaths[e.Id]);
+                paints.Add(pathID, paint);
                 tempPaths.Remove(e.Id);
+                pathID++;
             }
 
             //Once the event is handled, mark it as such and refresh the UI.
@@ -84,16 +90,17 @@ namespace Schmidt_Homework1
             ((SKCanvasView)sender).InvalidateSurface();
         }
 
-        //NEED TO ADD COLOR PICKER
         private async void OnColorPick(object sender, EventArgs e)
         {
-            //ColorPickerPopup popupPage = new ColorPickerPopup();
-            //await Rg.Plugins.Popup.Extensions.NavigationExtension.PushPopupAsync(this.Navigation, popupPage);
-            //await PopupNavigation.Instance.PushAsync(_colorPickerPopup);
-            PickColor.Text = "Clicked!";
-            var colorPage = new ColorPickerPopup(color);
+            var colorPage = new ColorPickerPopup(color, strokeWidth);
             await Navigation.PushModalAsync(colorPage);
-            //var newColor = await ColorPickerDialog.Show(mainGrid, "Pick a Color", Color.Black, null);
+            colorPage.ColorChosen += ChangeStrokeColor;
+        }
+
+        private void ChangeStrokeColor(object sender, ColorPickerEventArgs e)
+        {
+            color = new SKColor((byte)e.Red, (byte)e.Green, (byte)e.Blue);
+            strokeWidth = e.StrokeWidth;
         }
 
         /***
@@ -102,8 +109,10 @@ namespace Schmidt_Homework1
          **/
         private void OnClear(object sender, EventArgs e)
         {
-            //Clear list of drawn paths and refresh UI
+            //Clear list of paints and paths (temporary and permanent) and refresh UI
+            tempPaths.Clear();
             paths.Clear();
+            paints.Clear();
             Canvas.InvalidateSurface();
         }
 

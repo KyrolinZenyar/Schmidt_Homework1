@@ -1,12 +1,70 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:cp="clr-namespace:Amporis.Xamarin.Forms.ColorPicker;assembly=Amporis.Xamarin.Forms.ColorPicker"
              x:Class="Schmidt_Homework1.ColorPickerPopup">
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="ColorPickerMixer" Margin="0,30,0,10" />
-            <cp:ColorPickerMixer Color="Black"/>
-        </StackLayout>
+        <Grid Margin="50, 50, 50, 50">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="2*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Slider x:Name="red" Minimum="0" Maximum="255"
+                        ValueChanged="OnColorChange" Grid.Row="0"></Slider>
+                <Label x:Name="redLabel" Text="Red: 0" Grid.Row="1"></Label>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Slider x:Name="green" Minimum="0" Maximum="255"
+                        ValueChanged="OnColorChange" Grid.Row="0"></Slider>
+                <Label x:Name="greenLabel" Text="Green: 0" Grid.Row="1"></Label>
+            </Grid>
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Slider x:Name="blue" Minimum="0" Maximum="255"
+                        ValueChanged="OnColorChange" Grid.Row="0"></Slider>
+                <Label x:Name="blueLabel" Text="Blue: 0" Grid.Row="1"></Label>
+            </Grid>
+            
+            <BoxView x:Name="colorBox" Color="Black" 
+                     Grid.Row="3"
+                     VerticalOptions="Center" 
+                     HeightRequest="150"
+                     HorizontalOptions="Center"
+                     WidthRequest="150"></BoxView>
+            <Grid Grid.Row="4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Slider x:Name="strokeWidth" Minimum="0" Maximum="50"
+                        ValueChanged="OnStrokeChange" Grid.Row="0"></Slider>
+                <Label x:Name="strokeLabel" Text="Stroke Width: 3" Grid.Row="1"></Label>
+            </Grid>
+            <Grid Grid.Row="5" Margin="0, 20, 0, 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="SubmitButton" Text="Select Color" 
+                        Grid.Column="0" Clicked="OnSubmit"></Button>
+                <Button x:Name="CancelButton" Text="Cancel" 
+                        Grid.Column="1" Clicked="OnCancel"></Button>
+            </Grid>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>
