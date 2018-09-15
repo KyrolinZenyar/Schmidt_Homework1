@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
+using SkiaSharp;
 
 [assembly: Dependency(typeof(PhotoSaver))]
 public class PhotoSaver: IPhotoSaver
 {
-    public async Task<string> SaveAsync(byte[] photoData, string saveFileName)
+    public async Task<Boolean> SaveAsync(SKData photoData, string saveFileName)
     {
-        string test;
+        //string test;
         try
         {
             File pictureDir = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryPictures);
@@ -19,7 +20,7 @@ public class PhotoSaver: IPhotoSaver
             File saveFile = new File(pictureDir, saveFileName);
             //Android.App.Application.Context context;
 
-            test = saveFile.AbsolutePath;
+            //test = saveFile.AbsolutePath;
             //Activity activity = (Activity)Android.App.Application.Context;
             //if (ContextCompat.CheckSelfPermission(Android.App.Application.Context, Manifest.Permission.WriteExternalStorage) == (int)Permission.Granted)
             //{
@@ -34,7 +35,7 @@ public class PhotoSaver: IPhotoSaver
             var permStatus = await CrossPermissions.Current.CheckPermissionStatusAsync(Permission.Storage);
             if (permStatus != PermissionStatus.Granted)
             {
-                test = "Perms no";
+                //test = "Perms no";
                 var permResults = await CrossPermissions.Current.RequestPermissionsAsync(Permission.Storage);
                 permStatus = permResults[Permission.Storage];
                 
@@ -44,8 +45,12 @@ public class PhotoSaver: IPhotoSaver
             {
                 FileOutputStream outputStream = new FileOutputStream(saveFile);
                 saveFile.CreateNewFile();
-                await outputStream.WriteAsync(photoData);
-                test = "Perms yes";
+                //await outputStream.WriteAsync(photoData);
+                using (var stream = System.IO.File.OpenWrite(pictureDir.AbsolutePath + '/' + saveFileName))
+                {
+                    photoData.SaveTo(stream);
+                }
+                //test = String.Format("Perms yes {0}", photoData.Length);
             }
 
 
@@ -53,10 +58,10 @@ public class PhotoSaver: IPhotoSaver
         }
         catch (Exception e)
         {
-            test = e.InnerException.Message;
-            return test;
+            //test = e.InnerException.Message;
+            return false;
         }
 
-        return test;
+        return true;
     }
 }

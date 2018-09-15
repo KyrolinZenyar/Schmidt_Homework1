@@ -21,6 +21,7 @@ namespace Schmidt_Homework1
         private SKBitmap paintBitmap;
         private SKPaint paint;
         private long pathID = 0;
+        private SKImage snapshot;
 
         public DrawingPanel ()
 		{
@@ -55,8 +56,10 @@ namespace Schmidt_Homework1
                 paintCanvas.DrawPath(path.Value, paints[id]);
             }
 
+            //PROBLEM HERE?
             paintBitmap = new SKBitmap((int)Canvas.Width, (int)Canvas.Height);
             e.Surface.Canvas.DrawBitmap(paintBitmap, 0, 0);
+            //snapshot = e.Surface.Snapshot();
 
         }
 
@@ -150,29 +153,34 @@ namespace Schmidt_Homework1
             //SKBitmap paintBitmap = new SKBitmap(info.Width, info.Height);
             //canvas.DrawBitmap(paintBitmap, 0, 0);
 
-            SKImage paintPhoto = SKImage.FromBitmap(paintBitmap);
-            SKData photoData = paintPhoto.Encode();
+            //SKImage paintPhoto = SKImage.FromBitmap(paintBitmap);
+            //SKData photoData = paintPhoto.Encode();
+
+            SKData photoData = SKImage.FromBitmap(paintBitmap).Encode(SKEncodedImageFormat.Jpeg, 100);
+            //photoData.SaveTo()
 
             if(photoData == null)
             {
                 Save.Text = "photo data null";
             }
-            //else if(photoData.Length == 0)
+            //else if (photoData.Length == 0)
             //{
             //    Save.Text = "encode returned empty";
             //}
             else
             {
                 var photoSaver = DependencyService.Get<IPhotoSaver>();
-                string success = await DependencyService.Get<IPhotoSaver>().SaveAsync(photoData.ToArray(), "test.jpg");
-                //if (success == true)
-                //{
-                //    Save.Text = "Save success";
-                //}
-                //else
-                //{
-                //    Save.Text = "save failed";
-                //}
+                //CHANGE NAME OF FILE
+                //Boolean success = await DependencyService.Get<IPhotoSaver>().SaveAsync(photoData.ToArray(), "test.jpg");
+                Boolean success = await DependencyService.Get<IPhotoSaver>().SaveAsync(photoData, "test.jpg");
+                if (success == true)
+                {
+                    Save.Text = "Save success";
+                }
+                else
+                {
+                    Save.Text = "save failed";
+                }
                 //test.Text = success;
             }
 
