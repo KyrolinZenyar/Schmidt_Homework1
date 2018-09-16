@@ -28,9 +28,9 @@ namespace Schmidt_Homework1
             double blueImport = (double)color.Blue;
             strokeWidth.Value = 0;
             Device.StartTimer(TimeSpan.FromMilliseconds(1), () => {
-                red.Value = (double)color.Red;
-                green.Value = 0;
-                blue.Value = 0;
+                red.Value = redImport;
+                green.Value = greenImport;
+                blue.Value = blueImport;
                 strokeWidth.Value = stroke;
                 return false;
             });
