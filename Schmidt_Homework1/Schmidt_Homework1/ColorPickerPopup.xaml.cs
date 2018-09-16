@@ -18,11 +18,14 @@ namespace Schmidt_Homework1
 		{
 			InitializeComponent ();
             //This is to counteract a bug in Xamarin where the first tap of the slider doesn't fire the ValueChanged event
-            //Basically, set the initial value to non-zero, then after 1 millisecond, shift it back down to 0 so the first 
-            //change is made and the event fires from then on.
+            //Basically, set the initial value to non-zero, then after 1 millisecond, shift it back down to whatever the 
+            //prior value was so the change is made and the event fires from then on.
             red.Value = 1;
             green.Value = 1;
             blue.Value = 1;
+            double redImport = (double)color.Red;
+            double greenImport = (double)color.Green;
+            double blueImport = (double)color.Blue;
             strokeWidth.Value = 0;
             Device.StartTimer(TimeSpan.FromMilliseconds(1), () => {
                 red.Value = (double)color.Red;

@@ -21,7 +21,8 @@ namespace Schmidt_Homework1
         private SKBitmap paintBitmap;
         private SKPaint paint;
         private long pathID = 0;
-        private SKImage snapshot;
+        //private SKImage snapshot;
+        private long numberOfSaves = 0;
 
         public DrawingPanel ()
 		{
@@ -57,7 +58,25 @@ namespace Schmidt_Homework1
             }
 
             //PROBLEM HERE?
-            paintBitmap = new SKBitmap((int)Canvas.Width, (int)Canvas.Height);
+            // Create bitmap the size of the display surface
+            if (paintBitmap == null)
+            {
+                paintBitmap = new SKBitmap(e.Info.Width, e.Info.Height);
+            }
+            // Or create new bitmap for a new size of display surface
+            else if (paintBitmap.Width < e.Info.Width || paintBitmap.Height < e.Info.Height)
+            {
+                SKBitmap newBitmap = new SKBitmap(Math.Max(paintBitmap.Width, e.Info.Width),
+                                                  Math.Max(paintBitmap.Height, e.Info.Height));
+
+                using (SKCanvas newCanvas = new SKCanvas(newBitmap))
+                {
+                    newCanvas.Clear(SKColors.White);
+                    newCanvas.DrawBitmap(paintBitmap, 0, 0);
+                }
+
+                paintBitmap = newBitmap;
+            }
             e.Surface.Canvas.DrawBitmap(paintBitmap, 0, 0);
             //snapshot = e.Surface.Snapshot();
 
@@ -72,6 +91,7 @@ namespace Schmidt_Homework1
                 var path = new SKPath();
                 path.MoveTo(e.Location);
                 tempPaths[e.Id] = path;
+                UpdateBitmap();
             }
             else if (e.ActionType == SKTouchAction.Moved) {
                 //While the line is being drawn (finger moving)
@@ -79,6 +99,7 @@ namespace Schmidt_Homework1
                 {
                     tempPaths[e.Id].LineTo(e.Location);
                 }
+                UpdateBitmap();
             }
             else if (e.ActionType == SKTouchAction.Released) {
                 //When the line ends (finger up)
@@ -86,11 +107,32 @@ namespace Schmidt_Homework1
                 paints.Add(pathID, paint);
                 tempPaths.Remove(e.Id);
                 pathID++;
+                UpdateBitmap();
             }
 
             //Once the event is handled, mark it as such and refresh the UI.
             e.Handled = true;
             ((SKCanvasView)sender).InvalidateSurface();
+        }
+
+        void UpdateBitmap()
+        {
+            using (SKCanvas saveBitmapCanvas = new SKCanvas(paintBitmap))
+            {
+                saveBitmapCanvas.Clear(SKColors.White);
+
+                foreach (var path in tempPaths)
+                {
+                    saveBitmapCanvas.DrawPath(path.Value, paint);
+                }
+                foreach (var path in paths)
+                {
+                    var id = path.Key;
+
+                    saveBitmapCanvas.DrawPath(path.Value, paints[id]);
+                }
+            }
+
         }
 
         private async void OnColorPick(object sender, EventArgs e)
@@ -116,6 +158,7 @@ namespace Schmidt_Homework1
             tempPaths.Clear();
             paths.Clear();
             paints.Clear();
+            paintBitmap.Reset();
             Canvas.InvalidateSurface();
         }
 
@@ -172,15 +215,21 @@ namespace Schmidt_Homework1
                 var photoSaver = DependencyService.Get<IPhotoSaver>();
                 //CHANGE NAME OF FILE
                 //Boolean success = await DependencyService.Get<IPhotoSaver>().SaveAsync(photoData.ToArray(), "test.jpg");
-                Boolean success = await DependencyService.Get<IPhotoSaver>().SaveAsync(photoData, "test.jpg");
+                string saveFileName = String.Format("Schmidt_HW_1_Image_{0}.jpg", numberOfSaves);
+                Boolean success = await DependencyService.Get<IPhotoSaver>().SaveAsync(photoData, saveFileName);
                 if (success == true)
                 {
                     Save.Text = "Save success";
+                    numberOfSaves++;
                 }
                 else
                 {
                     Save.Text = "save failed";
                 }
+                Device.StartTimer(TimeSpan.FromMilliseconds(1000), () => {
+                    Save.Text = "Save";
+                    return false;
+                });
                 //test.Text = success;
             }
 

@@ -56,7 +56,7 @@ public class PhotoSaver: IPhotoSaver
 
 
         }
-        catch (Exception e)
+        catch
         {
             //test = e.InnerException.Message;
             return false;
