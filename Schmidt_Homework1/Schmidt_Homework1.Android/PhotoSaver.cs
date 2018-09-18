@@ -30,8 +30,12 @@ public class PhotoSaver: IPhotoSaver
                 //If permissions aren't granted, request them
                 var permResults = await CrossPermissions.Current.RequestPermissionsAsync(Permission.Storage);
                 permStatus = permResults[Permission.Storage];
-                //Return false from no permissions
-                return false;
+                //Return false for permissions denied
+                if (permStatus != PermissionStatus.Granted)
+                {
+                    return false;
+                }
+                    
                 
             }
 
