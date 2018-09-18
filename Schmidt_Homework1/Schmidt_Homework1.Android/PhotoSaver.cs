@@ -10,58 +10,50 @@ using SkiaSharp;
 [assembly: Dependency(typeof(PhotoSaver))]
 public class PhotoSaver: IPhotoSaver
 {
+    /**
+     *  Async task to save the canvas to gallery on button press.
+     * Parameters: photoData - the canvas data to be saved, saveFileName - the file name to save the photo under
+     * Gets permissions from user if needed and saves to gallery if permission given
+     **/
     public async Task<Boolean> SaveAsync(SKData photoData, string saveFileName)
     {
-        //string test;
         try
         {
+            //Get picture directory on filesystem and assemble file data for creation
             File pictureDir = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryPictures);
-            //string pictureDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             File saveFile = new File(pictureDir, saveFileName);
-            //Android.App.Application.Context context;
-
-            //test = saveFile.AbsolutePath;
-            //Activity activity = (Activity)Android.App.Application.Context;
-            //if (ContextCompat.CheckSelfPermission(Android.App.Application.Context, Manifest.Permission.WriteExternalStorage) == (int)Permission.Granted)
-            //{
-            //    ActivityCompat.RequestPermissions(activity, new String[] { Manifest.Permission.WriteExternalStorage }, 1);
-
-            //}
-            //else
-            //{
-
-            //}
-
+           
+            //Check if permissions granted
             var permStatus = await CrossPermissions.Current.CheckPermissionStatusAsync(Permission.Storage);
             if (permStatus != PermissionStatus.Granted)
             {
-                //test = "Perms no";
+                //If permissions aren't granted, request them
                 var permResults = await CrossPermissions.Current.RequestPermissionsAsync(Permission.Storage);
                 permStatus = permResults[Permission.Storage];
+                //Return false from no permissions
+                return false;
                 
             }
 
             if (permStatus == PermissionStatus.Granted)
             {
+                //If permissions are granted, create output stream for file
                 FileOutputStream outputStream = new FileOutputStream(saveFile);
+                //Create the file, then save the file
                 saveFile.CreateNewFile();
-                //await outputStream.WriteAsync(photoData);
-                using (var stream = System.IO.File.OpenWrite(pictureDir.AbsolutePath + '/' + saveFileName))
-                {
-                    photoData.SaveTo(stream);
-                }
-                //test = String.Format("Perms yes {0}", photoData.Length);
+                //Save photo file
+                var stream = System.IO.File.OpenWrite(pictureDir.AbsolutePath + '/' + saveFileName);
+                photoData.SaveTo(stream);
+                //Close the stream
+                stream.Close();
             }
-
-
-
         }
         catch
         {
-            //test = e.InnerException.Message;
+            //If an exception occurs, return that the saving failed.
             return false;
         }
-
+        //If the saving succeeds, return that.
         return true;
     }
 }

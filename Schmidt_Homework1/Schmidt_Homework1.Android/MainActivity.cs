@@ -26,6 +26,7 @@ namespace Schmidt_Homework1.Droid
 
         }
 
+        //Required for permissions plugin library
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
             PermissionsImplementation.Current.OnRequestPermissionsResult(requestCode, permissions, grantResults);

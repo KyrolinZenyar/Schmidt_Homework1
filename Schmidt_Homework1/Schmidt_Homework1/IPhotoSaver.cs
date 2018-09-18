@@ -8,7 +8,7 @@ namespace Schmidt_Homework1
 {
     public interface IPhotoSaver
     {
-        //Task<Boolean> SaveAsync(byte[] photoData, string saveFile);
+        //Interface for photo saver functionality
         Task<Boolean> SaveAsync(SKData photoData, string saveFile);
     }
 }

@@ -38,11 +38,13 @@ namespace Schmidt_Homework1
 
         }
 
+        //When the stroke width slider changes, update the text.
         private void OnStrokeChange(object sender, ValueChangedEventArgs e)
         {
             strokeLabel.Text = String.Format("Stroke Width: {0}", (int)e.NewValue);
         }
 
+        //When a color slider changes, update the respective text and the preview box's color.
         private void OnColorChange(object sender, ValueChangedEventArgs e)
         {
             if(sender == red)
@@ -62,11 +64,13 @@ namespace Schmidt_Homework1
             colorBox.Color = Color.FromRgb((int)red.Value, (int)green.Value, (int)blue.Value);
         }
 
+        //On cancel, just close the modal
         private async void OnCancel(object sender, EventArgs e)
         {
             await Navigation.PopModalAsync();
         }
 
+        //On submit, close the modal but also fill out the event arguments to return and fire the event listener.
         private async void OnSubmit(object sender, EventArgs e)
         {
             await Navigation.PopModalAsync();
@@ -79,6 +83,7 @@ namespace Schmidt_Homework1
         }
     }
 
+    //Class made for returning color and stroke width data by event listener
     public class ColorPickerEventArgs: EventArgs
     {
         public int Red { get; set; }

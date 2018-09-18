@@ -13,6 +13,7 @@ namespace Schmidt_Homework1
 	[XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class DrawingPanel : ContentPage
 	{
+        //Variable declarations
         private Dictionary<long, SKPath> tempPaths = new Dictionary<long, SKPath>();
         private Dictionary<long, SKPath> paths = new Dictionary<long, SKPath>();
         private Dictionary<long, SKPaint> paints = new Dictionary<long, SKPaint>();
@@ -21,7 +22,6 @@ namespace Schmidt_Homework1
         private SKBitmap paintBitmap;
         private SKPaint paint;
         private long pathID = 0;
-        //private SKImage snapshot;
         private long numberOfSaves = 0;
 
         public DrawingPanel ()
@@ -29,14 +29,17 @@ namespace Schmidt_Homework1
 			InitializeComponent ();
 		}
 
+        //When painting is occuring, this gets fired
         private void OnPainting(object sender, SKPaintSurfaceEventArgs e)
         {
+            //Get surface and canvas for painting
             var paintSurface = e.Surface;
             var paintCanvas = paintSurface.Canvas;
             
+            //Set white background for the canvas
             paintCanvas.Clear(SKColors.White);
 
-            //Define SKPaint here (need to make colorpicker and strokeWidth picker)
+            //Define paint features
             paint = new SKPaint
             {
                 Color = color,
@@ -57,31 +60,30 @@ namespace Schmidt_Homework1
                 paintCanvas.DrawPath(path.Value, paints[id]);
             }
 
-            //PROBLEM HERE?
-            // Create bitmap the size of the display surface
+            // Create bitmap the size of the display surface if no bitmap exists yet
             if (paintBitmap == null)
             {
                 paintBitmap = new SKBitmap(e.Info.Width, e.Info.Height);
             }
-            // Or create new bitmap for a new size of display surface
+            // Or create new bitmap for a new size of display surface if size has changed (more drawing outside prior drawing bounds)
             else if (paintBitmap.Width < e.Info.Width || paintBitmap.Height < e.Info.Height)
             {
+                //Create new bitmap based on whichever is bigger, the existing or new width/height
                 SKBitmap newBitmap = new SKBitmap(Math.Max(paintBitmap.Width, e.Info.Width),
                                                   Math.Max(paintBitmap.Height, e.Info.Height));
 
-                using (SKCanvas newCanvas = new SKCanvas(newBitmap))
-                {
-                    newCanvas.Clear(SKColors.White);
-                    newCanvas.DrawBitmap(paintBitmap, 0, 0);
-                }
-
+                //create new temp canvas for the bitmap and set its background to white, then overlay the existing bitmap on it
+                SKCanvas newCanvas = new SKCanvas(newBitmap);
+                newCanvas.Clear(SKColors.White);
+                newCanvas.DrawBitmap(paintBitmap, 0, 0);
+                
                 paintBitmap = newBitmap;
             }
+            //Draw new paths from canvas on the bitmap
             e.Surface.Canvas.DrawBitmap(paintBitmap, 0, 0);
-            //snapshot = e.Surface.Snapshot();
-
         }
 
+        //When a touch event occurs on the canvas, this gets fired
         private void OnTouch(object sender, SKTouchEventArgs e)
         {
 
@@ -115,35 +117,39 @@ namespace Schmidt_Homework1
             ((SKCanvasView)sender).InvalidateSurface();
         }
 
+        //This gets fired after every touch even to update the bitmap as the canvas is being changed
         void UpdateBitmap()
         {
-            using (SKCanvas saveBitmapCanvas = new SKCanvas(paintBitmap))
+            //Create new canvas for the bitmap and set its background to white
+            SKCanvas saveBitmapCanvas = new SKCanvas(paintBitmap);
+            saveBitmapCanvas.Clear(SKColors.White);
+            //Draw each new temporary and permanent path on the canvas
+            foreach (var path in tempPaths)
             {
-                saveBitmapCanvas.Clear(SKColors.White);
-
-                foreach (var path in tempPaths)
-                {
-                    saveBitmapCanvas.DrawPath(path.Value, paint);
-                }
-                foreach (var path in paths)
-                {
-                    var id = path.Key;
-
-                    saveBitmapCanvas.DrawPath(path.Value, paints[id]);
-                }
+                saveBitmapCanvas.DrawPath(path.Value, paint);
             }
-
+            foreach (var path in paths)
+            {
+                var id = path.Key;
+                saveBitmapCanvas.DrawPath(path.Value, paints[id]);
+            }
         }
 
+        //When the colorpicker button is presed, this is called
         private async void OnColorPick(object sender, EventArgs e)
         {
+            //Pop up a new color picker modal page
             var colorPage = new ColorPickerPopup(color, strokeWidth);
             await Navigation.PushModalAsync(colorPage);
+            //On the event listener being fired, change the stroke width and color,
+            //passing through the new color and stroke width
             colorPage.ColorChosen += ChangeStrokeColor;
         }
 
+        //Change the color and stroke width as returned by the color picker modal
         private void ChangeStrokeColor(object sender, ColorPickerEventArgs e)
         {
+            //Set the new stroke color and width
             color = new SKColor((byte)e.Red, (byte)e.Green, (byte)e.Blue);
             strokeWidth = e.StrokeWidth;
         }
@@ -162,75 +168,44 @@ namespace Schmidt_Homework1
             Canvas.InvalidateSurface();
         }
 
-        //NEED TO ADD SAVE FUNCTIONALITY
+        //When the save button is pressed, this is called
         private async void OnSave(object sender, EventArgs e)
         {
+            //Get canvas width and height
             var info = new SKImageInfo((int)Canvas.Width, (int)Canvas.Height);
-
-            //var surface = pain
-            //var canvas = paintSurface.Canvas;
-            //canvas.Clear();
-            //var paint = new SKPaint
-            //{
-            //    Color = color,
-            //    Style = SKPaintStyle.Stroke,
-            //    IsAntialias = true,
-            //    StrokeWidth = strokeWidth
-            //};
-
-            //foreach (SKPath path in paths)
-            //    canvas.DrawPath(path, paint);
-
-            //foreach (SKPath path in tempPaths.Values)
-            //    canvas.DrawPath(path, paint);
-
-            //canvas.Flush();
-
-            //var snap = surface.Snapshot();
-            //var pngImage = snap.Encode();
-
-            //SKImage image = SKImage.FromBitmap();
-
-            //byte[] photoData = pngImage.ToArray();
-
-            //SKBitmap paintBitmap = new SKBitmap(info.Width, info.Height);
-            //canvas.DrawBitmap(paintBitmap, 0, 0);
-
-            //SKImage paintPhoto = SKImage.FromBitmap(paintBitmap);
-            //SKData photoData = paintPhoto.Encode();
-
+            //Get the photo data to save from the bitmap that is keeping the canvas drawings, and encode it as a high quality JPG
             SKData photoData = SKImage.FromBitmap(paintBitmap).Encode(SKEncodedImageFormat.Jpeg, 100);
-            //photoData.SaveTo()
-
+            
+            //If the photo data is null, display that
             if(photoData == null)
             {
-                Save.Text = "photo data null";
+                Save.Text = "Data Null";
             }
-            //else if (photoData.Length == 0)
-            //{
-            //    Save.Text = "encode returned empty";
-            //}
+            //If the photo data isn't null, try to save it
             else
             {
+                //Define the photo saver method as per the interface/dependency injection
                 var photoSaver = DependencyService.Get<IPhotoSaver>();
-                //CHANGE NAME OF FILE
-                //Boolean success = await DependencyService.Get<IPhotoSaver>().SaveAsync(photoData.ToArray(), "test.jpg");
+                //Set the file name to be dependent on how many times an image has been saved.
                 string saveFileName = String.Format("Schmidt_HW_1_Image_{0}.jpg", numberOfSaves);
+                //Call the photo saver
                 Boolean success = await DependencyService.Get<IPhotoSaver>().SaveAsync(photoData, saveFileName);
+                //If the saving succeeded, increment the save number and tell the user
                 if (success == true)
                 {
                     Save.Text = "Save success";
                     numberOfSaves++;
                 }
+                //If the save failed, tell the user
                 else
                 {
                     Save.Text = "save failed";
                 }
+                //After a second, change the save button's text back to its normal text.
                 Device.StartTimer(TimeSpan.FromMilliseconds(1000), () => {
                     Save.Text = "Save";
                     return false;
                 });
-                //test.Text = success;
             }
 
         }
