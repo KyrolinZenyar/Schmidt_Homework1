@@ -10,23 +10,23 @@ Deployment is a simple matter of copying the provided .apk file to the device an
 
 # Usage Instructions
 
-<img src="https://i.imgur.com/52SQXxY.jpg" alt="Color Changer screen" height="400" width="350"/>
+<img src="https://i.imgur.com/52SQXxY.jpg" alt="Color Changer screen" height="715" width="350"/>
 
 On the Color Changer screen, simply tap in the text field to change the text, or the Change Color button to change the text field's contents and color, as shown below:
 
-<img src="https://i.imgur.com/gZFjFyr.jpg" alt="Changed color" height="400" width="350"/>
+<img src="https://i.imgur.com/gZFjFyr.jpg" alt="Changed color" height="715" width="350"/>
 
 Switching to the drawing canvas screen by the simple tabs at the top of the screen allows for finger drawing, as can be seen here:
 
-<img src="https://i.imgur.com/zfbWx2Z.jpg" alt="Drawn canvas" height="400" width="350"/>
+<img src="https://i.imgur.com/zfbWx2Z.jpg" alt="Drawn canvas" height="715" width="350"/>
 
 Along the bottom of this screen are the buttons for the color picker, clearing, and saving.  Pressing the clear buttons resets the canvas to a white screen, while pressing the save button will save the image to the device's Pictures folder.  Pressing the "Pick Color" button will open up a screen which allows for changing the stroke color and width:
 
-<img src="https://i.imgur.com/ulpX7km.jpg" alt="Color Picker" height="400" width="350"/>
+<img src="https://i.imgur.com/ulpX7km.jpg" alt="Color Picker" height="715" width="350"/>
 
 This only changes future drawings on the canvas, not existing strokes, as shown here:
 
-<img src="https://i.imgur.com/7wJFrDj.jpg" alt="Multiple colors" height="400" width="350"/>
+<img src="https://i.imgur.com/7wJFrDj.jpg" alt="Multiple colors" height="715" width="350"/>
 
 # Design Choices
 
